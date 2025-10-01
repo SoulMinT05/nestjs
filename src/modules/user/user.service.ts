@@ -1,25 +1,39 @@
 import { Injectable, Scope } from '@nestjs/common';
-import { DatabaseService } from 'src/config/database/database.service';
-import { CreateUserDto, FindAllUsersDto } from './user.controller';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class UserService {
-  constructor(private readonly db: DatabaseService) {
-    console.log('Khoi tao User Service');
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+  findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
-  findAllUsers(query: FindAllUsersDto) {
-    return query;
+  findUser(id: number): Promise<User | null> {
+    return this.userRepository.findOneBy({ id });
   }
-  create(body: CreateUserDto) {
+  create(userData: Partial<User>): Promise<User> {
+    const user = this.userRepository.create(userData);
+    return this.userRepository.save(user);
+  }
+  async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
+    await this.userRepository.update(id, userData);
+    return this.userRepository.findOneBy({ id });
+  }
+  async deleteUser(id: string) {
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) {
+      return {
+        success: false,
+        message: `User with id ${id} not found`,
+      };
+    }
     return {
-      name: body.name,
-      email: body.email,
+      success: true,
+      message: `User with id ${id} deleted successfully`,
     };
-  }
-  findUser(id: string) {
-    return `Get user with id: ${id}`;
-  }
-  deleteUser(id: string) {
-    return `Deleted user with id: ${id}`;
   }
 }
