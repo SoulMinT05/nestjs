@@ -29,6 +29,9 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
+
+      // 👇 Thêm cái này để tắt warning khó chịu khi dùng class-validator
+      '@typescript-eslint/no-unsafe-call': 'off',
       'prettier/prettier': [
         'error',
         {
