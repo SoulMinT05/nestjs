@@ -1,11 +1,15 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+
+export interface IRequest {
+  method: string;
+  url: string;
+}
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
-  use(req: any, res: any, next: () => void) {
-    console.log('Middleware');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    req.user = 'Soul';
+  use(req: IRequest, res: any, next: () => void) {
+    const logger = new Logger('Request Logger Middleware');
+    logger.log(`[${req.method} ${req.url}]`);
     next();
   }
 }

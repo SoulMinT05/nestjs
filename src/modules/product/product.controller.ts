@@ -3,8 +3,8 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
+  Logger,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -16,6 +16,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('product')
 export class ProductController {
+  private readonly logger = new Logger(ProductController.name);
   constructor(private readonly productService: ProductService) {}
   @Get('')
   getAll(@Req() req: Request & { user: string }) {
@@ -23,10 +24,11 @@ export class ProductController {
     return this.productService.getAll();
   }
   @Get('/:id')
-  async getOne(id: number) {
+  async getOne(@Param('id') id: number) {
     const product = await this.productService.getOne(id);
     if (!product) {
-      throw new HttpException('Không tìm thấy sản phẩm', HttpStatus.NOT_FOUND);
+      this.logger.error(`getOne - id: ${id}`);
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
     return product;
   }
