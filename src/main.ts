@@ -2,9 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ValidationError } from 'class-validator';
+// import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  // app.use(new LoggerMiddleware().use.bind(new LoggerMiddleware()));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

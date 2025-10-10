@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from 'src/modules/product/entities/product.entity';
@@ -17,7 +18,8 @@ import { CreateProductDto } from './dto/create-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
   @Get('')
-  getAll() {
+  getAll(@Req() req: Request & { user: string }) {
+    console.log(req.user);
     return this.productService.getAll();
   }
   @Get('/:id')

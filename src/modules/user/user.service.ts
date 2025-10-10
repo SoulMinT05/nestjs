@@ -1,9 +1,9 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
@@ -15,10 +15,6 @@ export class UserService {
   findUser(id: number): Promise<User | null> {
     return this.userRepository.findOneBy({ id });
   }
-  create(userData: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(userData);
-    return this.userRepository.save(user);
-  }
   async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
     await this.userRepository.update(id, userData);
     return this.userRepository.findOneBy({ id });
@@ -26,14 +22,25 @@ export class UserService {
   async deleteUser(id: string) {
     const result = await this.userRepository.delete(id);
     if (result.affected === 0) {
-      return {
-        success: false,
-        message: `User with id ${id} not found`,
-      };
+      throw new NotFoundException({
+        message: `Người dùng với ${id} không tồn tại`,
+      });
     }
     return {
       success: true,
-      message: `User with id ${id} deleted successfully`,
+      message: `Đã xóa người dùng với ${id}`,
+    };
+  }
+  async deleteAllUsers() {
+    const users = await this.userRepository.deleteAll();
+    if (users.affected === 0) {
+      throw new NotFoundException({
+        message: 'Không tồn tại người dùng để xóa',
+      });
+    }
+    return {
+      success: true,
+      message: `Đã xóa ${users.affected} người dùng`,
     };
   }
 }
