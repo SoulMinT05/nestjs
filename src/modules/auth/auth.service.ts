@@ -66,7 +66,7 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get<string>('TIME_JWT_REFRESH_TOKEN'),
+      expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRES'),
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
@@ -88,7 +88,7 @@ export class AuthService {
     try {
       // Check and decode refreshToken into user info
       const payload: IPayload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('JWT_ACCESS_TOKEN_KEY'),
+        secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
       });
       const user = await this.authRepository.findOneBy({ id: payload.sub });
       if (!user) {
@@ -106,7 +106,7 @@ export class AuthService {
           sub: user.id,
           email: user.email,
         },
-        { expiresIn: this.configService.get<string>('TIME_JWT_ACCESS_TOKEN') },
+        { expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES') },
       );
       return {
         accessToken: newAccessToken,
@@ -119,6 +119,19 @@ export class AuthService {
           : `Lỗi xác thực: ${error.message}`,
       );
     }
+  }
+
+  async getProfile(user: User) {
+    const userInDB = await this.authRepository.findOneBy({
+      id: user.id,
+    });
+    if (!userInDB) {
+      throw new NotFoundException('Không tìm thấy người dùng');
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...excludesPassword } = userInDB;
+    return excludesPassword;
   }
 }
 

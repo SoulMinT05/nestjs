@@ -10,6 +10,11 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { LocalAuthGuard } from 'src/guards/local-auth.guard';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { User } from '../user/entities/user.entity';
+
+export interface IRequestWithUser extends Request {
+  user: User;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -22,11 +27,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  // login(@Body() userData: CreateAuthDto) {
-  //   return this.authService.login(userData);
-  // }
-  login(@Request() req: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+  login(@Request() req: IRequestWithUser) {
     return this.authService.login(req.user);
   }
 
@@ -37,8 +38,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  getProfile(@Request() req: any) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-    return req.user;
+  getProfile(@Request() req: IRequestWithUser) {
+    return this.authService.getProfile(req.user);
   }
 }
