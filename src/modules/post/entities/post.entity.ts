@@ -3,21 +3,29 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToOne,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('phone')
-export class Phone {
+@Entity('post')
+export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  phone: string;
+  title: string;
 
-  @OneToOne(() => User, (user) => user.phone, { onDelete: 'CASCADE' })
+  @Column()
+  content: string;
+
+  @ManyToOne(() => User, (user) => user.post, { onDelete: 'CASCADE' })
+  @JoinColumn()
   user: User;
+
+  @Column({ default: true })
+  isPublished: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

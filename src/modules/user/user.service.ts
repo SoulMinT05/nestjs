@@ -15,15 +15,13 @@ export class UserService {
   ) {}
   getAllUsers(): Promise<User[]> {
     return this.userRepository.find({
-      relations: {
-        phone: true,
-      },
+      relations: ['phone', 'post'],
     });
   }
   getDetailUser(id: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
-      relations: { phone: true },
+      relations: ['phone', 'post'],
     });
   }
   async createUser(userData: ICreateUserDto) {
@@ -38,7 +36,7 @@ export class UserService {
 
     return this.userRepository.findOne({
       where: { id: user.id },
-      relations: ['phone'],
+      relations: ['phone', 'post'],
     });
   }
 
@@ -48,7 +46,7 @@ export class UserService {
 
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['phone'],
+      relations: ['phone', 'post'],
     });
     if (!user) throw new NotFoundException('Không tìm thấy người dùng');
 
@@ -63,32 +61,8 @@ export class UserService {
 
     return this.userRepository.findOne({
       where: { id },
-      relations: ['phone'],
+      relations: ['phone', 'post'],
     });
-
-    // const { phone, ...excludedPhone } = userData;
-
-    // await this.userRepository.update(id, excludedPhone);
-
-    // const user = await this.userRepository.findOne({
-    //   where: { id },
-    //   relations: ['phone'],
-    // });
-    // if (!user) throw new NotFoundException('Không tìm thấy người dùng');
-
-    // if (phone) {
-    //   if (user.phone) {
-    //     await this.phoneRepository.update(user.phone.id, { phone });
-    //   } else {
-    //     const phoneValue = await this.phoneRepository.save({ phone, user });
-    //     await this.userRepository.save({ ...user, phone: phoneValue });
-    //   }
-    // }
-
-    // return this.userRepository.findOne({
-    //   where: { id },
-    //   relations: { phone: true },
-    // });
   }
 
   async deleteUser(id: string) {

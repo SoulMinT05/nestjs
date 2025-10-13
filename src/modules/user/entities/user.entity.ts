@@ -1,4 +1,5 @@
 import { Phone } from 'src/entities/phone.entity';
+import { Post } from '../../post/entities/post.entity';
 import {
   Entity,
   Column,
@@ -7,6 +8,7 @@ import {
   UpdateDateColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('user')
@@ -20,12 +22,15 @@ export class User {
   @Column()
   name: string;
 
+  @Column()
+  password: string;
+
   @OneToOne(() => Phone, (phone) => phone.user, { onDelete: 'CASCADE' })
   @JoinColumn()
   phone: Phone;
 
-  @Column()
-  password: string;
+  @OneToMany(() => Post, (post) => post.user, { onDelete: 'CASCADE' })
+  post: Post[];
 
   @Column({ default: true })
   isActive: boolean;
