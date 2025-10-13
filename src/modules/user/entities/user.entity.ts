@@ -1,9 +1,12 @@
+import { Phone } from 'src/entities/phone.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity('user')
@@ -12,10 +15,14 @@ export class User {
   id: number;
 
   @Column()
-  name: string;
+  email: string;
 
   @Column()
-  email: string;
+  name: string;
+
+  @OneToOne(() => Phone, (phone) => phone.user, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  phone: Phone;
 
   @Column()
   password: string;

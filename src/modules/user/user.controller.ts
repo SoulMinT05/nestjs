@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 
 export class FindAllUsersDto {
@@ -6,25 +15,39 @@ export class FindAllUsersDto {
   page?: number;
 }
 
-export class CreateUserDto {
+export interface ICreateUserDto {
   name?: string;
   email: string;
+  phone?: string;
   password: string;
+}
+
+export interface IUpdateUserDto {
+  name?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
 }
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
-  @Get('/find-all')
-  findAll() {
-    return this.userService.findAll();
+  @Get('')
+  getAllUsers() {
+    return this.userService.getAllUsers();
   }
   @Get('/:id')
-  findUser(@Param('id') id: number) {
-    return this.userService.findUser(id);
+  async getDetailUser(@Param('id') id: number) {
+    const user = await this.userService.getDetailUser(id);
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+    return user;
+  }
+  @Post('')
+  create(@Body() body: ICreateUserDto) {
+    return this.userService.createUser(body);
   }
   @Put('/:id')
-  update(@Param('id') id: number, @Body() body: CreateUserDto) {
+  update(@Param('id') id: number, @Body() body: ICreateUserDto) {
     return this.userService.updateUser(id, body);
   }
   @Delete('/:id')

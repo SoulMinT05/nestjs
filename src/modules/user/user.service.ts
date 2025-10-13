@@ -2,26 +2,98 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { ICreateUserDto, IUpdateUserDto } from './user.controller';
+import { Phone } from 'src/entities/phone.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Phone)
+    private readonly phoneRepository: Repository<Phone>,
   ) {}
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  getAllUsers(): Promise<User[]> {
+    return this.userRepository.find({
+      relations: {
+        phone: true,
+      },
+    });
   }
-  findUser(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+  getDetailUser(id: number): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { id },
+      relations: { phone: true },
+    });
   }
-  async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
-    await this.userRepository.update(id, userData);
-    return this.userRepository.findOneBy({ id });
+  async createUser(userData: ICreateUserDto) {
+    const { phone, ...userInfo } = userData;
+
+    const user = await this.userRepository.save(userInfo);
+
+    if (phone) {
+      const phoneEntity = await this.phoneRepository.save({ phone, user });
+      await this.userRepository.save({ ...user, phone: phoneEntity });
+    }
+
+    return this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['phone'],
+    });
   }
+
+  async updateUser(id: number, userData: IUpdateUserDto) {
+    const { phone, ...excludedPhone } = userData;
+    await this.userRepository.update(id, excludedPhone);
+
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['phone'],
+    });
+    if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+    if (phone) {
+      if (user.phone) {
+        await this.phoneRepository.update(user.phone.id, { phone });
+      } else {
+        const phoneEntity = await this.phoneRepository.save({ phone, user });
+        await this.userRepository.save({ ...user, phone: phoneEntity });
+      }
+    }
+
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['phone'],
+    });
+
+    // const { phone, ...excludedPhone } = userData;
+
+    // await this.userRepository.update(id, excludedPhone);
+
+    // const user = await this.userRepository.findOne({
+    //   where: { id },
+    //   relations: ['phone'],
+    // });
+    // if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+    // if (phone) {
+    //   if (user.phone) {
+    //     await this.phoneRepository.update(user.phone.id, { phone });
+    //   } else {
+    //     const phoneValue = await this.phoneRepository.save({ phone, user });
+    //     await this.userRepository.save({ ...user, phone: phoneValue });
+    //   }
+    // }
+
+    // return this.userRepository.findOne({
+    //   where: { id },
+    //   relations: { phone: true },
+    // });
+  }
+
   async deleteUser(id: string) {
-    const result = await this.userRepository.delete(id);
-    if (result.affected === 0) {
+    const user = await this.userRepository.delete(id);
+    if (user.affected === 0) {
       throw new NotFoundException({
         message: `Người dùng với ${id} không tồn tại`,
       });

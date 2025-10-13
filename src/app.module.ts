@@ -5,8 +5,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User } from './modules/user/entities/user.entity';
-import { Product } from './modules/product/entities/product.entity';
 import { ProductModule } from './modules/product/product.module';
 import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 
@@ -25,7 +23,8 @@ import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
           username: config.get<string>('DB_USERNAME'),
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
-          entities: [User, Product],
+          entities: ['dist/**/*.entity{.ts,.js}'],
+          autoLoadEntities: true,
           synchronize: true,
         };
       },
