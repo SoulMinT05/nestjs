@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductModule } from './modules/product/product.module';
 import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 import { PostModule } from './modules/post/post.module';
+import { CourseModule } from './modules/course/course.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PostModule } from './modules/post/post.module';
     UserModule,
     ProductModule,
     PostModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

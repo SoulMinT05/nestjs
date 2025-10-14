@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 import { ICreateUserDto, IUpdateUserDto } from './user.controller';
 import { Phone } from 'src/entities/phone.entity';
 
@@ -25,13 +26,23 @@ export class UserService {
     });
   }
   async createUser(userData: ICreateUserDto) {
-    const { phone, ...userInfo } = userData;
+    const { phone, password, ...userInfo } = userData;
 
-    const user = await this.userRepository.save(userInfo);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await this.userRepository.save({
+      ...userInfo,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      password: hashedPassword,
+    });
 
     if (phone) {
       const phoneEntity = await this.phoneRepository.save({ phone, user });
-      await this.userRepository.save({ ...user, phone: phoneEntity });
+      await this.userRepository.save({
+        ...user,
+        phone: phoneEntity,
+      });
     }
 
     return this.userRepository.findOne({

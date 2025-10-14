@@ -9,7 +9,10 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
+import { Course } from 'src/modules/course/entities/course.entity';
 
 @Entity('user')
 export class User {
@@ -31,6 +34,10 @@ export class User {
 
   @OneToMany(() => Post, (post) => post.user, { onDelete: 'CASCADE' })
   post: Post[];
+
+  @ManyToMany(() => Course, (course) => course.users, { onDelete: 'CASCADE' })
+  @JoinTable()
+  courses: Course[];
 
   @Column({ default: true })
   isActive: boolean;
