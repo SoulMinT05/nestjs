@@ -10,6 +10,7 @@ import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 import { PostModule } from './modules/post/post.module';
 import { CourseModule } from './modules/course/course.module';
 import { CategoryModule } from './modules/category/category.module';
+import { ProductSizeModule } from './product-size/product-size.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CategoryModule } from './modules/category/category.module';
     PostModule,
     CourseModule,
     CategoryModule,
+    ProductSizeModule,
   ],
   controllers: [AppController],
   providers: [AppService],

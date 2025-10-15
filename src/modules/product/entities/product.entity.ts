@@ -1,9 +1,16 @@
 import slugify from 'slugify';
+import { Category } from 'src/modules/category/entities/category.entity';
+import { ProductSize } from 'src/product-size/entities/product-size.entity';
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,6 +24,32 @@ export class Product {
   name: string;
   @Column()
   slug: string;
+  @Column({ nullable: true })
+  categorySlug: string;
+  @Column({ nullable: true })
+  subCategorySlug: string;
+  @Column({ nullable: true })
+  thirdSubCategorySlug: string;
+
+  @Column({ nullable: true })
+  categoryId: number;
+  @Column({ nullable: true })
+  categoryName: string;
+  @Column({ nullable: true })
+  subCategoryId: number;
+  @Column({ nullable: true })
+  subCategoryName: string;
+  @Column({ nullable: true })
+  thirdSubCategoryId: number;
+  @Column({ nullable: true })
+  thirdSubCategoryName: string;
+
+  @ManyToOne(() => Category, (category) => category.products)
+  @JoinColumn()
+  category: Category;
+
+  @Column({ nullable: true })
+  brand: string;
   @Column({ type: 'text', nullable: true })
   description: string;
 
@@ -31,21 +64,24 @@ export class Product {
   price: number;
 
   @Column({ default: 500 })
-  count_in_stock: number;
+  countInStock: number;
   @Column({ default: 0 })
-  quantity_sold: number;
+  quantitySold: number;
   @Column({ default: 0 })
-  average_rating: number;
+  averageRating: number;
   @Column({ default: 0 })
-  review_count: number;
+  reviewCount: number;
 
   @Column({ default: true })
   isFeatured: boolean;
   @Column({ default: true })
   isPublished: boolean;
 
-  @Column('simple-array', { nullable: true })
-  product_size: [string];
+  @ManyToMany(() => ProductSize, (productSize) => productSize.products, {
+    cascade: true, // cho phép tự động insert size mới khi tạo product
+  })
+  @JoinTable()
+  productSizes: ProductSize[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
@@ -54,11 +90,39 @@ export class Product {
   updatedAt: Date;
 
   @BeforeInsert()
+  @BeforeUpdate()
   generateSlug() {
-    this.slug = slugify(this.name, { lower: true, strict: true });
+    this.slug = slugify(this.name, { lower: true, strict: true, locale: 'vi' });
+    if (this.categoryName) {
+      this.categorySlug = slugify(this.categoryName, {
+        lower: true,
+        strict: true,
+        locale: 'vi',
+      });
+
+      if (this.subCategoryName) {
+        this.subCategorySlug = slugify(this.subCategoryName, {
+          lower: true,
+          strict: true,
+          locale: 'vi',
+        });
+
+        if (this.thirdSubCategoryName) {
+          this.thirdSubCategorySlug = slugify(this.thirdSubCategoryName, {
+            lower: true,
+            strict: true,
+            locale: 'vi',
+          });
+        }
+      }
+    }
   }
+  @BeforeInsert()
+  @BeforeUpdate()
   generatePrice() {
     this.price =
-      this.oldPrice > 0 ? this.oldPrice - this.oldPrice * this.discount : 0;
+      this.oldPrice > 0
+        ? this.oldPrice - this.oldPrice * (this.discount / 100)
+        : 0;
   }
 }

@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsArray,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -11,31 +12,78 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'Cần nhập tên' })
   name: string;
 
-  @IsString({ message: 'Mô tả phải là ký tự' })
   @IsOptional()
-  description: string;
+  @IsString({ message: 'Mô tả phải là ký tự' })
+  description?: string;
+
+  @IsString({ message: 'Thương hiệu phải là ký tự' })
+  @IsNotEmpty({ message: 'Cần nhập thương hiệu' })
+  brand: string;
+
+  @IsNumber({}, { message: 'categoryId phải là ký tự' })
+  @IsNotEmpty({ message: 'Cần chọn danh mục' })
+  categoryId: number;
+
+  @IsString({ message: 'categoryName phải là ký tự' })
+  @IsNotEmpty({ message: 'Cần chọn danh mục' })
+  categoryName: string;
+
+  @IsOptional()
+  @IsNumber()
+  subCategoryId?: number;
+
+  @IsOptional()
+  @IsString()
+  subCategoryName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  thirdSubCategoryId?: number;
+
+  @IsOptional()
+  @IsString()
+  thirdSubCategoryName?: string;
 
   @IsNumber({}, { message: 'Giá phải là số' })
   oldPrice: number;
+
   @IsNumber({}, { message: 'Giảm giá phải là số' })
   discount: number;
+
+  // 🏷️ Ảnh
+  @IsOptional()
+  @IsArray({ message: 'Ảnh phải là một mảng' })
+  @IsString({ each: true })
+  images?: string[];
+
+  @IsOptional()
+  @IsArray({ message: 'productSizes phải là một mảng' })
+  @IsString({ each: true })
+  productSizes?: string[];
+
+  // 🏷️ Tồn kho & thông tin phụ
   @IsOptional()
   @IsNumber({}, { message: 'Số lượng tồn kho phải là số' })
-  count_in_stock: number;
+  countInStock?: number;
+
   @IsOptional()
   @IsNumber()
-  quantity_sold: number;
+  quantitySold?: number;
+
   @IsOptional()
   @IsNumber()
-  average_rating: number;
+  averageRating?: number;
+
   @IsOptional()
   @IsNumber()
-  review_count: number;
+  reviewCount?: number;
+
+  // 🏷️ Cờ hiển thị
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
 
   @IsOptional()
   @IsBoolean()
-  isFeatured: boolean;
-  @IsOptional()
-  @IsBoolean()
-  isPublished: boolean;
+  isPublished?: boolean;
 }
