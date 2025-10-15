@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable({})
-export class DatabaseService {
+export class DatabaseConfig {
   findAllUsers() {
     return 'all users';
   }

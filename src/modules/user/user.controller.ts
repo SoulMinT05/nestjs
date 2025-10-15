@@ -52,7 +52,7 @@ export class UserController {
   }
   @Delete('/:id')
   deleteUser(@Param('id') id: string) {
-    return this.userService.deleteUser(id);
+    return this.userService.deleteUser(+id);
   }
   @Delete('')
   deleteAllUsers() {

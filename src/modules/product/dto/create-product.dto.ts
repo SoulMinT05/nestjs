@@ -34,8 +34,8 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsBoolean()
-  is_featured: boolean;
+  isFeatured: boolean;
   @IsOptional()
   @IsBoolean()
-  is_published: boolean;
+  isPublished: boolean;
 }

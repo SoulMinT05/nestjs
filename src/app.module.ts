@@ -9,6 +9,7 @@ import { ProductModule } from './modules/product/product.module';
 import { LoggerMiddleware } from './middlewares/logger/logger.middleware';
 import { PostModule } from './modules/post/post.module';
 import { CourseModule } from './modules/course/course.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CourseModule } from './modules/course/course.module';
     ProductModule,
     PostModule,
     CourseModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

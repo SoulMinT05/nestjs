@@ -40,18 +40,18 @@ export class Product {
   review_count: number;
 
   @Column({ default: true })
-  is_featured: boolean;
+  isFeatured: boolean;
   @Column({ default: true })
-  is_published: boolean;
+  isPublished: boolean;
 
   @Column('simple-array', { nullable: true })
   product_size: [string];
 
   @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
+  createdAt: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updated_at: Date;
+  updatedAt: Date;
 
   @BeforeInsert()
   generateSlug() {
